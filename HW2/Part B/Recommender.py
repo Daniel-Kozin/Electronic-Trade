@@ -24,6 +24,9 @@ class Recommender:
             for podcast in range(len(self.item_prices)):
                 self.distribution[person].append((1, 1))
 
+        # Used in UCB
+        self.C = 7.5
+
     # Thompson Sampling
     def recommend(self) -> np.array:
         res = np.zeros(self.n_users, dtype=int)
@@ -64,11 +67,10 @@ class Recommender:
 
         estimated_mean = self.num_wins / self.num_chosen
         # calculating radius of UCB
-        rad = np.sqrt(2 * np.log(self.n_rounds) / (7.5 * self.num_chosen))
+        rad = np.sqrt(2 * np.log(self.n_rounds) / (self.C * self.num_chosen))
         ucb = estimated_mean + rad
         #print(ucb)
         self.podcasts = self.get_podcasts(ucb)
-
 
 # TODO: optimize this
     def get_initial_podcasts(self):
