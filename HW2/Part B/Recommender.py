@@ -1,6 +1,6 @@
 import numpy as np
 
-
+#note
 class Recommender:
     def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int):
         self.n_rounds = n_weeks
