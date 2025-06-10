@@ -1,6 +1,5 @@
 import numpy as np
 
-#note
 class Recommender:
     def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int):
         self.n_rounds = n_weeks
@@ -59,8 +58,13 @@ class Recommender:
 
             self.distribution[i][chosen_podcast] = (a, b)
 
+        """for podcast in self.podcasts:
+            if podcast not in self.recommendations:
+                self.num_chosen[podcast] += 0.5"""
+
         estimated_mean = self.num_wins / self.num_chosen
-        rad = np.sqrt(2 * np.log(self.n_rounds) / self.num_chosen)
+        # calculating radius of UCB
+        rad = np.sqrt(2 * np.log(self.n_rounds) / (7.5 * self.num_chosen))
         ucb = estimated_mean + rad
         #print(ucb)
         self.podcasts = self.get_podcasts(ucb)

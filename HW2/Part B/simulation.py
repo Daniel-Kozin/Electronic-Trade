@@ -105,11 +105,11 @@ class Simulation():
         return reward
     
 if __name__ == '__main__':
-    """
+
     sum1 = 0
     sum2 = 0
     sum3 = 0
-    for i in range(50):
+    for i in range(100):
         simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
         x = simulation.simulate()
         sum1 += x
@@ -120,10 +120,10 @@ if __name__ == '__main__':
         z = simulation.simulate()
         sum3 += z
 
-    print(f'Reward 1 = {sum1 / 50}')
-    print(f'Reward 2 = {sum2 / 50}')
-    print(f'Reward 3 = {sum3 / 50}')"""
-
+    print(f'Reward 1 = {sum1 / 100}')
+    print(f'Reward 2 = {sum2 / 100}')
+    print(f'Reward 3 = {sum3 / 100}')
+"""
     simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
     x = simulation.simulate()
     simulation = Simulation(test_2['P'], test_2['item_prices'], test_2['budget'], test_2['n_weeks'])
@@ -133,4 +133,4 @@ if __name__ == '__main__':
 
     print(f'Reward 1 = {x}')
     print(f'Reward 2 = {y}')
-    print(f'Reward 3 = {z}')
+    print(f'Reward 3 = {z}') """
