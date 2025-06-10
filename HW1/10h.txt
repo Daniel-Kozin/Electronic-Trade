@@ -1,0 +1,116 @@
+"C:\Users\kozin\PycharmProjects\Electronic Trade\.venv\Scripts\python.exe" "C:\Users\kozin\PycharmProjects\Electronic Trade\HW1\Praducci_simulation.py"
+--- Praducci Influence Simulation ---
+
+Loading data files...
+Successfully read graph from NoseBook_friendships.csv
+Successfully read haters from haters.csv
+Successfully read costs from costs.csv
+
+Reading example influencers from selected_users.csv...
+Searching best node: 100%|██████████| 3989/3989 [9:43:11<00:00,  8.77s/node]
+
+The group right now is {2473}
+The price right now is 100.0 / 1500
+The score right now is 608
+
+Searching best node: 100%|██████████| 3988/3988 [1:12:32<00:00,  1.09s/node]
+
+The group right now is {2473, 3159}
+The price right now is 200.0 / 1500
+The score right now is 997
+
+Searching best node: 100%|██████████| 3987/3987 [1:19:53<00:00,  1.20s/node]
+
+The group right now is {2473, 233, 3159}
+The price right now is 300.0 / 1500
+The score right now is 1178
+
+Searching best node: 100%|██████████| 3986/3986 [1:34:07<00:00,  1.42s/node]
+
+The group right now is {2473, 3851, 233, 3159}
+The price right now is 400.0 / 1500
+The score right now is 1450
+
+Searching best node: 100%|██████████| 3985/3985 [1:47:22<00:00,  1.62s/node]
+
+The group right now is {2473, 233, 3851, 3159, 507}
+The price right now is 500.0 / 1500
+The score right now is 1594
+
+Searching best node: 100%|██████████| 3984/3984 [1:20:42<00:00,  1.22s/node]
+
+The group right now is {2473, 233, 3851, 3159, 507, 2588}
+The price right now is 600.0 / 1500
+Searching best node:   0%|          | 0/3983 [00:00<?, ?node/s]The score right now is 1757
+
+Searching best node: 100%|██████████| 3983/3983 [1:21:37<00:00,  1.23s/node]
+
+The group right now is {2473, 233, 3851, 2364, 3159, 507, 2588}
+The price right now is 700.0 / 1500
+The score right now is 1986
+
+Searching best node: 100%|██████████| 3982/3982 [1:16:20<00:00,  1.15s/node]
+
+The group right now is {2473, 233, 3851, 2364, 3159, 1784, 507, 2588}
+The price right now is 800.0 / 1500
+Searching best node:   0%|          | 0/3981 [00:00<?, ?node/s]The score right now is 1957
+
+Searching best node: 100%|██████████| 3981/3981 [1:16:50<00:00,  1.16s/node]
+
+The group right now is {2473, 233, 3851, 2420, 2364, 3159, 1784, 507, 2588}
+The price right now is 900.0 / 1500
+The score right now is 2080
+
+Searching best node: 100%|██████████| 3980/3980 [1:12:44<00:00,  1.10s/node]
+
+The group right now is {2473, 233, 3851, 1899, 2420, 2364, 3159, 1784, 507, 2588}
+The price right now is 1000.0 / 1500
+The score right now is 2053
+
+Searching best node: 100%|██████████| 3979/3979 [1:14:01<00:00,  1.12s/node]
+
+The group right now is {1573, 2473, 233, 3851, 1899, 2420, 2364, 3159, 1784, 507, 2588}
+The price right now is 1100.0 / 1500
+The score right now is 2095
+
+Searching best node: 100%|██████████| 3978/3978 [1:33:52<00:00,  1.42s/node]
+
+The group right now is {1573, 2565, 2473, 233, 3851, 1899, 2420, 2364, 3159, 1784, 507, 2588}
+The price right now is 1200.0 / 1500
+The score right now is 2139
+
+Searching best node: 100%|██████████| 3977/3977 [1:17:13<00:00,  1.17s/node]
+
+The group right now is {2114, 1573, 2565, 2473, 233, 3851, 1899, 2420, 2364, 3159, 1784, 507, 2588}
+The price right now is 1300.0 / 1500
+Searching best node:   0%|          | 0/3976 [00:00<?, ?node/s]The score right now is 2242
+
+Searching best node: 100%|██████████| 3976/3976 [3:13:00<00:00,  2.91s/node]
+
+The group right now is {2114, 1573, 2565, 2473, 233, 3851, 1899, 2420, 2364, 3159, 1784, 507, 2588, 1022}
+The price right now is 1400.0 / 1500
+The score right now is 2217
+
+Searching best node: 100%|██████████| 3975/3975 [1:40:48<00:00,  1.52s/node]
+
+The group right now is {2114, 1573, 2565, 2473, 233, 3851, 1899, 3530, 2420, 2364, 3159, 1784, 507, 2588, 1022}
+The price right now is 1500.0 / 1500
+The score right now is 2298
+
+{2114, 1573, 2565, 2473, 233, 3851, 1899, 3530, 2420, 2364, 3159, 1784, 507, 2588, 1022}
+1500.0
+Iteration: 0/1000
+Iteration: 100/1000
+Iteration: 200/1000
+Iteration: 300/1000
+Iteration: 400/1000
+Iteration: 500/1000
+Iteration: 600/1000
+Iteration: 700/1000
+Iteration: 800/1000
+Iteration: 900/1000
+The expected value is E = 2268.51
+
+--- End of Simulation Script ---
+
+Process finished with exit code 0
