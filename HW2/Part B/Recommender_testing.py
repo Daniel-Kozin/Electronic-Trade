@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Recommender:
     def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int):
         self.n_rounds = n_weeks
@@ -23,9 +24,6 @@ class Recommender:
         for person in range(n_users):
             for podcast in range(len(self.item_prices)):
                 self.distribution[person].append((1, 1))
-
-        # Used in UCB
-        self.C = 7.5
 
     # Thompson Sampling
     def recommend(self) -> np.array:
@@ -67,12 +65,12 @@ class Recommender:
 
         estimated_mean = self.num_wins / self.num_chosen
         # calculating radius of UCB
-        rad = np.sqrt(2 * np.log(self.n_rounds) / (self.C * self.num_chosen))
+        rad = np.sqrt(2 * np.log(self.n_rounds) / (7.5 * self.num_chosen))
         ucb = estimated_mean + rad
-        #print(ucb)
+        # print(ucb)
         self.podcasts = self.get_podcasts(ucb)
 
-# TODO: optimize this
+    # TODO: optimize this
     def get_initial_podcasts(self):
         indexed_prices = []
         for original_index, price in enumerate(self.item_prices):
@@ -91,24 +89,45 @@ class Recommender:
                 current_cost += price
             else:
                 break
-        #print(f'selected_indices is {selected_indices} and the price is {current_cost}')
+        # print(f'selected_indices is {selected_indices} and the price is {current_cost}')
         return selected_indices
 
     def get_podcasts(self, scores):
-        indexed_scores = []
-        for original_index, score in enumerate(scores):
-            indexed_scores.append((score, original_index))
+        best_subset = self.find_best_subset(scores)
+        return best_subset
 
-        indexed_scores.sort(key=lambda x: x[0], reverse=True)
+    def find_best_subset(self, scores):
+        """
+        Find subsets of items where the total price is between self.budget - 5 and self.budget.
 
-        selected_indices = []
-        current_cost = 0
+        Args:
+            scores: List of scores for each item.
+            self: An object containing:
+                - item_prices: List of prices for each item.
+                - budget: The maximum budget.
 
-        for score, original_index in indexed_scores:
-            if current_cost + self.item_prices[original_index] <= self.budget:
-                selected_indices.append(original_index)
-                current_cost += self.item_prices[original_index]
+        Returns:
+            List of tuples where each tuple contains:
+                - a tuple of indexes representing the subset
+                - the sum of scores for that subset
+        """
+        item_prices = self.item_prices
+        budget = self.budget
+        n = len(item_prices)
+        valid_subsets = []
 
-        #print(f'selected_indices is {selected_indices} and the price is {current_cost}')
-        return selected_indices
+        # We'll use bitmasking to generate all possible subsets
+        for mask in range(1, 1 << n):
+            # Get the indexes where the bit is set
+            indexes = [i for i in range(n) if (mask & (1 << i))]
+
+            total_price = np.sum(item_prices[indexes])
+            total_score = np.sum(np.array(scores)[indexes])
+
+            if (budget - 5) <= total_price <= budget:
+                valid_subsets.append((indexes, total_score))
+        best_subset = max(valid_subsets, key=lambda x: x[1])
+
+        return best_subset
+
 

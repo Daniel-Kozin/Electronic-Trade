@@ -40,7 +40,7 @@ class Simulation():
             
         return True
     
-    def simulate(self) -> int:
+    def simulate(self, C, B) -> int:
         total_time_taken = 0
         
         init_start = time.perf_counter()
@@ -48,7 +48,7 @@ class Simulation():
         try:
             recommender = Recommender(n_weeks=self.n_weeks, n_users=self.P.shape[0], 
                                       prices=self.item_prices.copy(), 
-                                      budget=self.budget)
+                                      budget=self.budget, C=C, B=B)
         except Exception as e:
             print('Recommender __init__ caused error')
             raise e
@@ -105,24 +105,25 @@ class Simulation():
         return reward
     
 if __name__ == '__main__':
+    list_of_b = [0, 0.25, 0.5, 0.75, 1, 2, 3, 5]
+    for B in list_of_b:
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        for i in range(20):
+            simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
+            x = simulation.simulate(C=7.3, B=B)
+            sum1 += x
+            simulation = Simulation(test_2['P'], test_2['item_prices'], test_2['budget'], test_2['n_weeks'])
+            y = simulation.simulate(C=7.3, B=B)
+            sum2 += y
+            simulation = Simulation(test_3['P'], test_3['item_prices'], test_3['budget'], test_3['n_weeks'])
+            z = simulation.simulate(C=7.3, B=B)
+            sum3 += z
 
-    sum1 = 0
-    sum2 = 0
-    sum3 = 0
-    for i in range(100):
-        simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
-        x = simulation.simulate()
-        sum1 += x
-        simulation = Simulation(test_2['P'], test_2['item_prices'], test_2['budget'], test_2['n_weeks'])
-        y = simulation.simulate()
-        sum2 += y
-        simulation = Simulation(test_3['P'], test_3['item_prices'], test_3['budget'], test_3['n_weeks'])
-        z = simulation.simulate()
-        sum3 += z
-
-    print(f'Reward 1 = {sum1 / 100}')
-    print(f'Reward 2 = {sum2 / 100}')
-    print(f'Reward 3 = {sum3 / 100}')
+        print(f'Reward 1 with B = {B} is {sum1 / 20}')
+        print(f'Reward 2 with B = {B} is {sum2 / 20}')
+        print(f'Reward 3 with B = {B} is {sum3 / 20}')
 """
     simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
     x = simulation.simulate()
