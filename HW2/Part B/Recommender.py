@@ -1,12 +1,14 @@
 import numpy as np
 
 class Recommender:
-    def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int):
+    def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int, al, be):
         self.n_rounds = n_weeks
         self.n_users = n_users
         self.item_prices = prices
         self.budget = budget
 
+        self.al = al
+        self.be = be
         # Needed for calculating the mean in the UCB part
         eps = 1e-5
         self.num_chosen = np.full(shape=len(self.item_prices), fill_value=eps)
@@ -25,7 +27,7 @@ class Recommender:
                 self.distribution[person].append((1, 1))
 
         # Used in UCB
-        self.C = 7.5
+        self.C = 7.3
 
     # Thompson Sampling
     def recommend(self) -> np.array:
@@ -52,12 +54,18 @@ class Recommender:
 
             # For UCB part
             self.num_chosen[chosen_podcast] += 1
-
+            # 7, 7 - 7453, 2374, 4598
+            # 7, 10 - 7452 2409 4578
+            # 5, 7 - 7446 2402 4600
+            # 3, 5 - 7432 2395 4660
+            # 5, 3 - 7446 2402 4611
+            # 4, 6 - 7442 2401 4660
+            # 5, 8 - 7445 2391 4663
             if res == 1:
-                a += 1
+                a += self.al
                 self.num_wins[chosen_podcast] += 1  # For UCB part
             else:
-                b += 1
+                b += self.be
 
             self.distribution[i][chosen_podcast] = (a, b)
 

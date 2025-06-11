@@ -1,18 +1,21 @@
 import time
 from test import test_1, test_2, test_3
-
+from tqdm import tqdm
 from Recommender import Recommender
 import numpy as np
 
 
 TOTAL_TIME_LIMIT = 120 # seconds
 
+
 class Simulation():
-    def __init__(self, P: np.array, prices: np.array, budget, n_weeks: int):
+    def __init__(self, P: np.array, prices: np.array, budget, n_weeks: int , alpha, beta):
         self.P = P.copy()
         self.item_prices = prices
         self.budget = budget
         self.n_weeks = n_weeks
+        self.al = alpha
+        self.beta = beta
 
     def _validate_recommendation(self, recommendation):
         if not isinstance(recommendation, np.ndarray):
@@ -48,7 +51,7 @@ class Simulation():
         try:
             recommender = Recommender(n_weeks=self.n_weeks, n_users=self.P.shape[0], 
                                       prices=self.item_prices.copy(), 
-                                      budget=self.budget)
+                                      budget=self.budget, al=self.al, be=self.beta)
         except Exception as e:
             print('Recommender __init__ caused error')
             raise e
@@ -101,28 +104,52 @@ class Simulation():
                 total_time_taken += time_for_current_round
                 reward = next_reward
         
-        print(f'Total time taken: {total_time_taken} seconds')
+        #print(f'Total time taken: {total_time_taken} seconds')
         return reward
-    
+
+
 if __name__ == '__main__':
 
-    sum1 = 0
-    sum2 = 0
-    sum3 = 0
-    for i in range(100):
-        simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
-        x = simulation.simulate()
-        sum1 += x
-        simulation = Simulation(test_2['P'], test_2['item_prices'], test_2['budget'], test_2['n_weeks'])
-        y = simulation.simulate()
-        sum2 += y
-        simulation = Simulation(test_3['P'], test_3['item_prices'], test_3['budget'], test_3['n_weeks'])
-        z = simulation.simulate()
-        sum3 += z
+    results = []
 
-    print(f'Reward 1 = {sum1 / 100}')
-    print(f'Reward 2 = {sum2 / 100}')
-    print(f'Reward 3 = {sum3 / 100}')
+    alphas = [i for i in range(1, 11)]
+    betas = [i for i in range(1, 11)]
+    iterations = 100
+
+    # Total combinations = len(alphas) * len(betas)
+    for alpha, beta in tqdm([(a, b) for a in alphas for b in betas], desc="Testing alpha/beta pairs"):
+        sum1 = 0
+        sum2 = 0
+        sum3 = 0
+        for i in range(iterations):
+            simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'], alpha, beta)
+            x = simulation.simulate()
+            sum1 += x
+
+            simulation = Simulation(test_2['P'], test_2['item_prices'], test_2['budget'], test_2['n_weeks'], alpha, beta)
+            y = simulation.simulate()
+            sum2 += y
+
+            simulation = Simulation(test_3['P'], test_3['item_prices'], test_3['budget'], test_3['n_weeks'], alpha, beta)
+            z = simulation.simulate()
+            sum3 += z
+
+        avg1 = sum1 / iterations
+        avg2 = sum2 / iterations
+        avg3 = sum3 / iterations
+        overall_avg = (avg1 + avg2 + avg3) / 3
+
+        results.append(((alpha, beta), avg1, avg2, avg3, overall_avg))
+
+    # Sort by overall average reward descending
+    top_10 = sorted(results, key=lambda x: x[4], reverse=True)[:10]
+
+    # Print top 10 configurations with individual average rewards
+    print('\nTop 10 (alpha, beta) configurations by average reward:')
+    for rank, ((alpha, beta), avg1, avg2, avg3, _) in enumerate(top_10, 1):
+        print(f'{rank}. Alpha = {alpha}, Beta = {beta} → Reward 1 = {avg1:.2f}, Reward 2 = {avg2:.2f}, Reward 3 = {avg3:.2f}')
+
+
 """
     simulation = Simulation(test_1['P'], test_1['item_prices'], test_1['budget'], test_1['n_weeks'])
     x = simulation.simulate()
