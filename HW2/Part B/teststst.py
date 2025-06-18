@@ -7,36 +7,33 @@ class Recommender:
         self.item_prices = prices
         self.budget = budget
 
-        # Needed for calculating the mean in the UCB part
-        eps = 1e-5
+        eps = 1e-5  # small number to avoid division by zero
         self.num_chosen = np.full(shape=len(self.item_prices), fill_value=eps)
         self.num_wins = np.zeros(len(self.item_prices))
 
-        # Possible podcasts to choose from
+        # Initially select cheapest podcasts that fit budget
         self.podcasts = self.get_initial_podcasts()
 
-        # The podcasts we recommended
+        # Store last recommendations to update stats later
         self.recommendations = None
 
-        # Defining basic beta distribution per person per podcast
+        # Thompson Sampling distributions per user per podcast (optional, can keep or remove)
         self.distribution = {i: [] for i in range(n_users)}
         for person in range(n_users):
             for podcast in range(len(self.item_prices)):
-                self.distribution[person].append((1, 1))
+                self.distribution[person].append((1, 1))  # Beta(1,1)
 
-        # Used in UCB
-        self.C = 7.5
-
-    # Thompson Sampling
     def recommend(self) -> np.array:
+        """
+        Recommend one podcast per user from the current selected set self.podcasts.
+        Uses Thompson Sampling per user.
+        """
         res = np.zeros(self.n_users, dtype=int)
         for user in range(self.n_users):
             samples = []
-
-            for i, podcast in enumerate(self.podcasts):
+            for podcast in self.podcasts:
                 a, b = self.distribution[user][podcast]
                 samples.append(np.random.beta(a, b))
-
             chosen_idx = np.argmax(samples)
             chosen = self.podcasts[chosen_idx]
             res[user] = chosen
@@ -45,70 +42,71 @@ class Recommender:
         return self.recommendations
 
     def update(self, results: np.array):
-        # Updating the distributions
-        for i, res in enumerate(results):
+        """
+        Update the statistics based on user feedback.
+        results: array of 0/1 rewards for each user.
+        """
+        current_round = self.n_rounds
+
+        for i, reward in enumerate(results):
             chosen_podcast = self.recommendations[i]
-            a, b = self.distribution[i][chosen_podcast]
+            reward_val = 1 if reward == 1 else 0
 
-            # For UCB part
+            # Update global stats
             self.num_chosen[chosen_podcast] += 1
+            self.num_wins[chosen_podcast] += reward_val
 
-            if res == 1:
+            # Update Beta distribution per user (optional)
+            a, b = self.distribution[i][chosen_podcast]
+            if reward_val == 1:
                 a += 1
-                self.num_wins[chosen_podcast] += 1  # For UCB part
             else:
                 b += 1
-
             self.distribution[i][chosen_podcast] = (a, b)
 
-        """for podcast in self.podcasts:
-            if podcast not in self.recommendations:
-                self.num_chosen[podcast] += 0.5"""
-
+        # Calculate cost-aware UCB scores
         estimated_mean = self.num_wins / self.num_chosen
-        # calculating radius of UCB
-        rad = np.sqrt(2 * np.log(self.n_rounds) / (self.C * self.num_chosen))
-        ucb = estimated_mean + rad
-        #print(ucb)
-        self.podcasts = self.get_podcasts(ucb)
+        log_term = np.log(current_round + 1)  # +1 to avoid log(0)
 
-# TODO: optimize this
+        confidence_radius = np.sqrt((2 * log_term) / self.num_chosen)
+
+        # Avoid division by zero price
+        prices_safe = np.maximum(self.item_prices, 1e-6)
+
+        ucb_scores = (estimated_mean + confidence_radius) / prices_safe
+
+        # Select podcasts greedily by UCB score subject to budget
+        self.podcasts = self.get_podcasts(ucb_scores)
+
     def get_initial_podcasts(self):
-        indexed_prices = []
-        for original_index, price in enumerate(self.item_prices):
-            indexed_prices.append((price, original_index))
-
-        # This ensures we pick the cheapest items first
-        indexed_prices.sort(key=lambda x: x[0])
+        # Select cheapest podcasts that fit within the budget initially
+        indexed_prices = [(price, idx) for idx, price in enumerate(self.item_prices)]
+        indexed_prices.sort(key=lambda x: x[0])  # ascending by price
 
         selected_indices = []
         current_cost = 0
 
-        # Iterate through the sorted items, adding them if within budget
-        for price, original_index in indexed_prices:
+        for price, idx in indexed_prices:
             if current_cost + price <= self.budget:
-                selected_indices.append(original_index)
+                selected_indices.append(idx)
                 current_cost += price
             else:
                 break
-        #print(f'selected_indices is {selected_indices} and the price is {current_cost}')
+
         return selected_indices
 
     def get_podcasts(self, scores):
-        indexed_scores = []
-        for original_index, score in enumerate(scores):
-            indexed_scores.append((score, original_index))
-
-        indexed_scores.sort(key=lambda x: x[0], reverse=True)
+        # Select podcasts greedily by scores within budget
+        indexed_scores = [(score, idx) for idx, score in enumerate(scores)]
+        indexed_scores.sort(key=lambda x: x[0], reverse=True)  # descending
 
         selected_indices = []
         current_cost = 0
 
-        for score, original_index in indexed_scores:
-            if current_cost + self.item_prices[original_index] <= self.budget:
-                selected_indices.append(original_index)
-                current_cost += self.item_prices[original_index]
+        for score, idx in indexed_scores:
+            price = self.item_prices[idx]
+            if current_cost + price <= self.budget:
+                selected_indices.append(idx)
+                current_cost += price
 
-        #print(f'selected_indices is {selected_indices} and the price is {current_cost}')
         return selected_indices
-

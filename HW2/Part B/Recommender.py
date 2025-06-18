@@ -1,14 +1,12 @@
 import numpy as np
 
 class Recommender:
-    def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int, al, be):
+    def __init__(self, n_weeks: int, n_users: int, prices: np.array, budget: int):
         self.n_rounds = n_weeks
         self.n_users = n_users
         self.item_prices = prices
         self.budget = budget
 
-        self.al = al
-        self.be = be
         # Needed for calculating the mean in the UCB part
         eps = 1e-5
         self.num_chosen = np.full(shape=len(self.item_prices), fill_value=eps)
@@ -62,16 +60,17 @@ class Recommender:
             # 4, 6 - 7442 2401 4660
             # 5, 8 - 7445 2391 4663
             if res == 1:
-                a += self.al
+                a += 5
                 self.num_wins[chosen_podcast] += 1  # For UCB part
             else:
-                b += self.be
+                b += 8
 
             self.distribution[i][chosen_podcast] = (a, b)
 
-        """for podcast in self.podcasts:
-            if podcast not in self.recommendations:
-                self.num_chosen[podcast] += 0.5"""
+        unchosen = set(self.podcasts) - set(self.recommendations)
+        for podcast in unchosen:
+            self.num_chosen[podcast] += 0.5 # small penalty to reflect lack of selection
+
 
         estimated_mean = self.num_wins / self.num_chosen
         # calculating radius of UCB
